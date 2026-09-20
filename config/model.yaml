@@ -1,0 +1,24 @@
+agent:
+  name: FideliJudge
+  version: "0.1.0"
+  chinese_name: 保真判
+
+model:
+  # 无 API Key 时必须用 mock，避免 openai_compat 静默 fallback 污染评测。
+  # 接 DeepSeek：FIDELI_LLM_PROVIDER=openai_compat + FIDELI_LLM_API_KEY
+  provider: mock  # mock | openai_compat
+  name: deepseek-flash
+  base_url: https://api.deepseek.com/v1
+  temperature: 0
+  timeout: 60
+  prompt_version: "v1.0"
+  max_retries: 2
+
+skills:
+  diff: true
+  change_classifier: true
+  time: true
+  number: true
+  entity: true
+  fact: true
+  semantic_judge: true

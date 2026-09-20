@@ -1,0 +1,39 @@
+weights:
+  structure: 0.10
+  entity: 0.20
+  number: 0.20
+  time: 0.20
+  factual: 0.30
+
+penalties:
+  HIGH: 8
+  CRITICAL: 25
+
+# Rule-only types that skip LLM when clearly format-only
+skip_llm_types:
+  - FORMAT
+  - STRUCTURE
+
+default_scores:
+  FORMAT: 98
+  STRUCTURE: 95
+  TERM: 90
+  ENTITY: 70
+  NUMBER: 55
+  TIME: 60
+  FACT: 35
+  DELETION: 40
+  ADDITION: 65
+  UNKNOWN: 70
+
+default_risk:
+  FORMAT: LOW
+  STRUCTURE: LOW
+  TERM: MEDIUM
+  ENTITY: HIGH
+  NUMBER: HIGH
+  TIME: HIGH
+  FACT: CRITICAL
+  DELETION: CRITICAL
+  ADDITION: MEDIUM
+  UNKNOWN: MEDIUM

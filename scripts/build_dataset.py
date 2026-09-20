@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Build starter evaluation dataset for FideliJudge."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+CASES = [
+    {"id": "case_001", "before": "项目于2025年6月11日完成验收。", "after": "项目于2025年完成验收。", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "时间精度损失", "route": "REVIEW"},
+    {"id": "case_002", "before": "项目金额为1850万元。", "after": "项目金额为1800万元。", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "金额数值改变", "route": "REJECT"},
+    {"id": "case_003", "before": "国家电网有限公司", "after": "国家电网", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "机构简称归一", "route": "AUTO_PASS"},
+    {"id": "case_004", "before": "项目已完成验收", "after": "项目正在验收", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "事实状态改变", "route": "REJECT"},
+    {"id": "case_005", "before": "完成  验收", "after": "完成 验收", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "空格清理", "route": "AUTO_PASS"},
+    {"id": "case_006", "before": "增长18.5%", "after": "增长18%", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "百分比精度损失", "route": "REJECT"},
+    {"id": "case_007", "before": "张三负责该项目", "after": "李四负责该项目", "label": "UNSAFE", "change_type": "ENTITY", "risk": "HIGH", "reason": "人物实体替换", "route": "REVIEW"},
+    {"id": "case_008", "before": "项目于2025年6月完成", "after": "项目于2025年6月完成", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "无变化", "route": "AUTO_PASS"},
+    {"id": "case_009", "before": "北京市海淀区中关村", "after": "北京海淀中关村", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "地名简称", "route": "AUTO_PASS"},
+    {"id": "case_010", "before": "合同金额人民币100万元整。", "after": "合同金额人民币100万。", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "用语简化", "route": "AUTO_PASS"},
+    {"id": "case_011", "before": "验收于2024-06-11完成", "after": "验收于2024-06完成", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "日期粒度损失", "route": "REVIEW"},
+    {"id": "case_012", "before": "共有120人参加", "after": "共有100人参加", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "人数错误", "route": "REJECT"},
+    {"id": "case_013", "before": "华为技术有限公司", "after": "华为", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "企业简称", "route": "AUTO_PASS"},
+    {"id": "case_014", "before": "审批已通过", "after": "审批未通过", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "通过/未通过翻转", "route": "REJECT"},
+    {"id": "case_015", "before": "预算为3.2亿元", "after": "预算为3亿元", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "金额舍入损失", "route": "REJECT"},
+    {"id": "case_016", "before": "项目，于今日启动。", "after": "项目于今日启动。", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "标点清理", "route": "AUTO_PASS"},
+    {"id": "case_017", "before": "计划2025年第三季度交付", "after": "计划2025年交付", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "季度信息删除", "route": "REVIEW"},
+    {"id": "case_018", "before": "负责人：王五", "after": "负责人：", "label": "UNSAFE", "change_type": "DELETION", "risk": "CRITICAL", "reason": "关键实体删除", "route": "REJECT"},
+    {"id": "case_019", "before": "成果属于甲乙双方共有", "after": "成果属于甲方", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "权属事实改变", "route": "REJECT"},
+    {"id": "case_020", "before": "温度控制在36.5度", "after": "温度控制在36度", "label": "UNSAFE", "change_type": "NUMBER", "risk": "HIGH", "reason": "小数精度损失", "route": "REVIEW"},
+    {"id": "case_021", "before": "中国科学院计算技术研究所", "after": "中科院计算所", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "机构惯用简称", "route": "AUTO_PASS"},
+    {"id": "case_022", "before": "会议定于明天召开", "after": "会议定于今天召开", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "相对时间改变", "route": "REVIEW"},
+    {"id": "case_023", "before": "产品质量合格", "after": "产品质量不合格", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "否定关系变化", "route": "REJECT"},
+    {"id": "case_024", "before": "覆盖华东、华北地区", "after": "覆盖华东地区", "label": "UNSAFE", "change_type": "DELETION", "risk": "HIGH", "reason": "范围信息删除", "route": "REVIEW"},
+    {"id": "case_025", "before": "版本号 V1.2.0", "after": "版本号 V1.2.0", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "相同", "route": "AUTO_PASS"},
+    {"id": "case_026", "before": "采购数量 500 台", "after": "采购数量 50 台", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "数量级错误", "route": "REJECT"},
+    {"id": "case_027", "before": "上海交通大学", "after": "交大", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "高校简称", "route": "AUTO_PASS"},
+    {"id": "case_028", "before": "项目于2025年6月11日完成验收，金额1850万元。", "after": "项目于2025年完成验收，金额1800万元。", "label": "UNSAFE", "change_type": "COMBINATION", "risk": "CRITICAL", "reason": "时间+金额双重错误", "route": "REJECT"},
+    {"id": "case_029", "before": "系统可用性达到99.99%", "after": "系统可用性达到99.9%", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "可用性指标改写", "route": "REJECT"},
+    {"id": "case_030", "before": "该意见已被批准", "after": "该意见已被否决", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "批准/否决翻转", "route": "REJECT"},
+    {"id": "case_031", "before": "地址：浙江省杭州市西湖区", "after": "地址：浙江杭州西湖", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "行政区简称", "route": "AUTO_PASS"},
+    {"id": "case_032", "before": "开工日期2023年1月1日，竣工2024年12月31日", "after": "开工日期2023年，竣工2024年", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "起止时间粒度损失", "route": "REVIEW"},
+    {"id": "case_033", "before": "客户满意度提升了", "after": "客户满意度下降了", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "趋势方向改变", "route": "REJECT"},
+    {"id": "case_034", "before": "附件见附录A", "after": "附件见附录A。", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "句号补全", "route": "AUTO_PASS"},
+    {"id": "case_035", "before": "由阿里巴巴集团提供支持", "after": "由腾讯集团提供支持", "label": "UNSAFE", "change_type": "ENTITY", "risk": "HIGH", "reason": "企业实体替换", "route": "REVIEW"},
+    {"id": "case_036", "before": "税率13%", "after": "税率13％", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "百分号字符统一", "route": "AUTO_PASS"},
+    {"id": "case_037", "before": "预计今年内完成", "after": "预计去年内完成", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "相对时间错改", "route": "REVIEW"},
+    {"id": "case_038", "before": "共投入研发人员30名", "after": "共投入研发人员30名，含实习生5名", "label": "SAFE", "change_type": "ADDITION", "risk": "MEDIUM", "reason": "补充说明", "route": "REVIEW"},
+    {"id": "case_039", "before": "结论：实验成功", "after": "结论：实验失败", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "结论极性翻转", "route": "REJECT"},
+    {"id": "case_040", "before": "合同编号 HT-2025-001", "after": "合同编号 HT-2025-001", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "一致", "route": "AUTO_PASS"},
+    # --- 长文档：相似度会很高，用来证明不能靠字面相似做质检 ---
+    {"id": "case_041", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目金额为1850万元。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目金额为1800万元。", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "长文中金额被改写", "route": "REJECT", "anchor_tokens": ["1850", "1800"]},
+    {"id": "case_042", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目已完成验收。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目正在验收。", "label": "UNSAFE", "change_type": "FACT", "risk": "CRITICAL", "reason": "长文中验收状态翻转", "route": "REJECT", "anchor_tokens": ["已完成", "正在"]},
+    {"id": "case_043", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目于2025年6月11日完成验收。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。项目于2025年完成验收。", "label": "UNSAFE", "change_type": "TIME", "risk": "HIGH", "reason": "长文中时间粒度损失", "route": "REVIEW", "anchor_tokens": ["6月11日"]},
+    {"id": "case_044", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。完成  验收。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。完成 验收。", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "长文合法空格清洗", "route": "AUTO_PASS"},
+    {"id": "case_045", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。承建单位为国家电网有限公司。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。承建单位为国家电网。", "label": "SAFE", "change_type": "TERM", "risk": "MEDIUM", "reason": "长文机构简称", "route": "AUTO_PASS"},
+    {"id": "case_046", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。张三负责该项目。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。李四负责该项目。", "label": "UNSAFE", "change_type": "ENTITY", "risk": "HIGH", "reason": "长文人物替换", "route": "REVIEW", "anchor_tokens": ["张三", "李四"]},
+    {"id": "case_047", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。产量增长18.5%。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。产量增长18%。", "label": "UNSAFE", "change_type": "NUMBER", "risk": "CRITICAL", "reason": "长文百分比精度损失", "route": "REJECT", "anchor_tokens": ["18.5", "18"]},
+    {"id": "case_048", "before": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。附件见附录A。", "after": "根据工作安排，现将有关情况报告如下。项目位于华东区域。建设内容包括线路改造与设备更新。相关过程资料已完成归档。后续工作按既有计划推进。附件见附录A。", "label": "SAFE", "change_type": "FORMAT", "risk": "LOW", "reason": "长文无变化", "route": "AUTO_PASS"},
+    # --- 合法删除：给 overcleaning_f1 负样本 ---
+    {"id": "case_049", "before": "项目验收结论如下。本文档由办公系统自动生成，请勿回复。", "after": "项目验收结论如下。", "label": "SAFE", "change_type": "DELETION", "risk": "LOW", "reason": "清除自动生成提示", "route": "AUTO_PASS"},
+    {"id": "case_050", "before": "免责声明：本材料仅供参考。合同金额为1850万元。", "after": "合同金额为1850万元。", "label": "SAFE", "change_type": "DELETION", "risk": "LOW", "reason": "清除免责声明套话", "route": "AUTO_PASS"},
+    {"id": "case_051", "before": "正文内容保持不变。页脚：第1页共1页。", "after": "正文内容保持不变。", "label": "SAFE", "change_type": "DELETION", "risk": "LOW", "reason": "清除页脚", "route": "AUTO_PASS"},
+    {"id": "case_052", "before": "机密-内部资料。项目位于华东区域。", "after": "项目位于华东区域。", "label": "SAFE", "change_type": "DELETION", "risk": "LOW", "reason": "清除密级页眉", "route": "AUTO_PASS"},
+    # --- 相邻双句同时修改：验证多锚点 ---
+    {"id": "case_053", "before": "国家电网有限公司承建。合同金额1850万元。", "after": "国家电网承建。合同金额1800万元。", "label": "UNSAFE", "change_type": "COMBINATION", "risk": "CRITICAL", "reason": "相邻句：简称+金额", "route": "REJECT", "anchor_tokens": ["有限公司", "1850"]},
+    {"id": "case_054", "before": "项目于2025年6月11日完成验收。审批已通过。", "after": "项目于2025年完成验收。审批未通过。", "label": "UNSAFE", "change_type": "COMBINATION", "risk": "CRITICAL", "reason": "相邻句：时间+事实翻转", "route": "REJECT", "anchor_tokens": ["6月11日", "已通过"]},
+]
+
+
+def main() -> None:
+    root = Path(__file__).resolve().parents[1]
+    out = root / "datasets" / "evaluation.jsonl"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8") as f:
+        for case in CASES:
+            f.write(json.dumps(case, ensure_ascii=False) + "\n")
+    print(f"Wrote {len(CASES)} cases -> {out}")
+
+
+if __name__ == "__main__":
+    main()

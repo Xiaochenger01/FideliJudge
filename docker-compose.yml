@@ -1,0 +1,9 @@
+services:
+  fideli-judge:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      FIDELI_LLM_PROVIDER: mock
+    volumes:
+      - ./data:/app/data

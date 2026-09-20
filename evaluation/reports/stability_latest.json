@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-09-12T07:30:47.120015+00:00",
+  "n": 5,
+  "scores": [
+    53.6,
+    53.6,
+    53.6,
+    53.6,
+    53.6
+  ],
+  "routes": [
+    "REJECT",
+    "REJECT",
+    "REJECT",
+    "REJECT",
+    "REJECT"
+  ],
+  "stats": {
+    "n": 5,
+    "mean": 53.6,
+    "std": 0.0,
+    "variance": 0.0,
+    "scores": [
+      53.6,
+      53.6,
+      53.6,
+      53.6,
+      53.6
+    ],
+    "agreement_rate": 1.0
+  },
+  "route_agreement": 1.0,
+  "judge_provider": "mock",
+  "temperature": 0.0,
+  "deterministic_mock": true,
+  "note": "std=0 来自确定性 Mock Judge，不能当作 LLM 稳定性证据。"
+}

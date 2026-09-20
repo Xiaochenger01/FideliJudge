@@ -1,0 +1,4 @@
+时间变化专项判断。关注粒度损失、时间顺序、起止时间是否被错误改写。
+只输出 JSON：is_faithful, risk_level, score, reason, evidence, confidence。
+before={before}
+after={after}

@@ -1,0 +1,907 @@
+{
+  "timestamp": "2026-09-12T07:34:29.711135+00:00",
+  "dataset": "datasets/evaluation.jsonl",
+  "n": 54,
+  "ablation": "sentence_align",
+  "judge_mode": {
+    "provider": "mock",
+    "config_provider": "mock",
+    "model": "deepseek-flash",
+    "temperature": 0.0,
+    "note": "本轮默认 mock（规则+确定性 Judge）。接真实 LLM 需设置 FIDELI_LLM_API_KEY。"
+  },
+  "judge_source_counts": {
+    "mock_llm": 59,
+    "rule": 12
+  },
+  "methods": {
+    "fideli_judge": {
+      "accuracy": 0.9074,
+      "precision_unsafe": 0.8649,
+      "recall_unsafe": 1.0,
+      "f1_unsafe": 0.9275,
+      "tp": 32,
+      "fp": 5,
+      "tn": 17,
+      "fn": 0,
+      "route_accuracy": 0.7593,
+      "localization_accuracy": 0.98
+    },
+    "text_similarity": {
+      "accuracy": 0.6111,
+      "precision_unsafe": 0.6571,
+      "recall_unsafe": 0.7188,
+      "f1_unsafe": 0.6866,
+      "tp": 23,
+      "fp": 12,
+      "tn": 10,
+      "fn": 9
+    },
+    "char_ngram_tfidf": {
+      "accuracy": 0.6111,
+      "precision_unsafe": 0.6341,
+      "recall_unsafe": 0.8125,
+      "f1_unsafe": 0.7123,
+      "tp": 26,
+      "fp": 15,
+      "tn": 7,
+      "fn": 6
+    },
+    "ablation_wo_diff": {
+      "accuracy": 0.8519,
+      "precision_unsafe": 0.8,
+      "recall_unsafe": 1.0,
+      "f1_unsafe": 0.8889,
+      "tp": 32,
+      "fp": 8,
+      "tn": 14,
+      "fn": 0,
+      "note": "复用本系统 ChangeClassifier + MockJudge，无 Diff 锚点。不是外部基线。"
+    }
+  },
+  "overcleaning_f1": {
+    "accuracy": 1.0,
+    "precision_unsafe": 1.0,
+    "recall_unsafe": 1.0,
+    "f1_unsafe": 1.0,
+    "tp": 10,
+    "fp": 0,
+    "tn": 4,
+    "fn": 0
+  },
+  "caveats": {
+    "localization": "含 anchor_tokens 的样本按是否覆盖全部关键片段计；其余为 span 重叠，短文本上偏乐观。",
+    "overcleaning_f1": "仅在 gold change_type ∈ {DELETION, FACT} 的子集上计算，需含 SAFE 负样本才有意义。",
+    "ablation_wo_diff": "复用分类器，短单句上会接近主方法；长文才拉开与字面相似度的差距。",
+    "human_labels": "author_v1 与数据集 route 同源，不是独立标注；需另找同学填写 datasets/peer_labels.jsonl。"
+  },
+  "details": [
+    {
+      "id": "case_001",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 53.6,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER"
+      ],
+      "sim_score": 83.87,
+      "emb_score": 63.88,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_002",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 91.67,
+      "emb_score": 69.49,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_003",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 98.4,
+      "ours_risk": "MEDIUM",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "TERM"
+      ],
+      "sim_score": 66.67,
+      "emb_score": 52.46,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_004",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 44.9,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 61.54,
+      "emb_score": 22.58,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_005",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 90.91,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 98.0
+    },
+    {
+      "id": "case_006",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 83.33,
+      "emb_score": 45.02,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_007",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 71.43,
+      "emb_score": 50.31,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_008",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 100.0,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 100.0,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 100.0
+    },
+    {
+      "id": "case_009",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 87.5,
+      "emb_score": 41.12,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_010",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 98.4,
+      "ours_risk": "MEDIUM",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "TERM"
+      ],
+      "sim_score": 92.31,
+      "emb_score": 72.41,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_011",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 53.6,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER"
+      ],
+      "sim_score": 88.89,
+      "emb_score": 68.3,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_012",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 87.5,
+      "emb_score": 55.86,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_013",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 98.4,
+      "ours_risk": "MEDIUM",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "TERM"
+      ],
+      "sim_score": 40.0,
+      "emb_score": 27.89,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_014",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 44.9,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 80.0,
+      "emb_score": 33.61,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_015",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 85.71,
+      "emb_score": 51.94,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_016",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 94.12,
+      "emb_score": 67.35,
+      "ablation_wo_diff_score": 98.0
+    },
+    {
+      "id": "case_017",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 86.0,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME"
+      ],
+      "sim_score": 81.82,
+      "emb_score": 56.88,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_018",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 57.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "DELETION"
+      ],
+      "sim_score": 80.0,
+      "emb_score": 65.7,
+      "ablation_wo_diff_score": 40.0
+    },
+    {
+      "id": "case_019",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 75.0,
+      "emb_score": 43.93,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_020",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 88.89,
+      "emb_score": 61.52,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_021",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 66.67,
+      "emb_score": 15.97,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_022",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 78.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "ENTITY"
+      ],
+      "sim_score": 87.5,
+      "emb_score": 55.86,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_023",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 92.31,
+      "emb_score": 58.03,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_024",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 80.0,
+      "emb_score": 47.43,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_025",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 100.0,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 100.0,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 100.0
+    },
+    {
+      "id": "case_026",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 94.74,
+      "emb_score": 86.74,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_027",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 50.0,
+      "emb_score": 0.0,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_028",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 53.6,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER"
+      ],
+      "sim_score": 85.71,
+      "emb_score": 63.29,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_029",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REVIEW",
+      "ours_score": 83.0,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 96.0,
+      "emb_score": 96.7,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_030",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 44.9,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 71.43,
+      "emb_score": 50.31,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_031",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 85.71,
+      "emb_score": 47.74,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_032",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 53.6,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER"
+      ],
+      "sim_score": 77.27,
+      "emb_score": 59.49,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_033",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 44.9,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 75.0,
+      "emb_score": 40.3,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_034",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 92.31,
+      "emb_score": 84.66,
+      "ablation_wo_diff_score": 98.0
+    },
+    {
+      "id": "case_035",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 70.0,
+      "emb_score": 39.22,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_036",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 91.0,
+      "ours_risk": "MEDIUM",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "UNKNOWN"
+      ],
+      "sim_score": 80.0,
+      "emb_score": 60.3,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_037",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 78.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "ENTITY"
+      ],
+      "sim_score": 85.71,
+      "emb_score": 50.31,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_038",
+      "gold": "SAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 60.4,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER",
+        "TERM"
+      ],
+      "sim_score": 74.07,
+      "emb_score": 62.79,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_039",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 52.5,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT"
+      ],
+      "sim_score": 71.43,
+      "emb_score": 50.31,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_040",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 100.0,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 100.0,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 100.0
+    },
+    {
+      "id": "case_041",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 98.73,
+      "emb_score": 95.4,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_042",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 44.9,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 96.64,
+      "emb_score": 92.95,
+      "ablation_wo_diff_score": 25.0
+    },
+    {
+      "id": "case_043",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REJECT",
+      "ours_score": 53.6,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER"
+      ],
+      "sim_score": 96.97,
+      "emb_score": 92.69,
+      "ablation_wo_diff_score": 70.0
+    },
+    {
+      "id": "case_044",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 99.32,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 98.0
+    },
+    {
+      "id": "case_045",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 98.4,
+      "ours_risk": "MEDIUM",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "TERM"
+      ],
+      "sim_score": 97.47,
+      "emb_score": 92.96,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_046",
+      "gold": "UNSAFE",
+      "gold_route": "REVIEW",
+      "ours_route": "REVIEW",
+      "ours_score": 84.4,
+      "ours_risk": "HIGH",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY"
+      ],
+      "sim_score": 97.33,
+      "emb_score": 92.68,
+      "ablation_wo_diff_score": 62.0
+    },
+    {
+      "id": "case_047",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 62.0,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "NUMBER"
+      ],
+      "sim_score": 98.68,
+      "emb_score": 95.03,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_048",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 100.0,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 100.0,
+      "emb_score": 100.0,
+      "ablation_wo_diff_score": 100.0
+    },
+    {
+      "id": "case_049",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 50.0,
+      "emb_score": 42.86,
+      "ablation_wo_diff_score": 40.0
+    },
+    {
+      "id": "case_050",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 64.86,
+      "emb_score": 54.76,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_051",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 64.29,
+      "emb_score": 50.23,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_052",
+      "gold": "SAFE",
+      "gold_route": "AUTO_PASS",
+      "ours_route": "AUTO_PASS",
+      "ours_score": 99.8,
+      "ours_risk": "LOW",
+      "ours_label": "SAFE",
+      "pred_types": [
+        "FORMAT"
+      ],
+      "sim_score": 69.23,
+      "emb_score": 57.97,
+      "ablation_wo_diff_score": 92.0
+    },
+    {
+      "id": "case_053",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 54.4,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "ENTITY",
+        "NUMBER"
+      ],
+      "sim_score": 85.0,
+      "emb_score": 59.45,
+      "ablation_wo_diff_score": 55.0
+    },
+    {
+      "id": "case_054",
+      "gold": "UNSAFE",
+      "gold_route": "REJECT",
+      "ours_route": "REJECT",
+      "ours_score": 23.5,
+      "ours_risk": "CRITICAL",
+      "ours_label": "UNSAFE",
+      "pred_types": [
+        "TIME",
+        "NUMBER",
+        "FACT",
+        "ENTITY"
+      ],
+      "sim_score": 83.72,
+      "emb_score": 59.08,
+      "ablation_wo_diff_score": 70.0
+    }
+  ]
+}

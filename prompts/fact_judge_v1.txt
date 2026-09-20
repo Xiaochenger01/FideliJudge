@@ -1,0 +1,4 @@
+事实变化专项判断。比较治理前后片段，判断事件状态、极性、主体动作是否改变。
+只输出 JSON：is_faithful, risk_level, score, reason, evidence, confidence。
+before={before}
+after={after}

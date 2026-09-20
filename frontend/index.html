@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>保真判 FideliJudge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0f1c17;
+      --bg1: #163028;
+      --ink: #e8f2ec;
+      --muted: #9bb5a8;
+      --accent: #3ecf8e;
+      --warn: #e6b35c;
+      --danger: #e57373;
+      --line: rgba(232, 242, 236, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", "Noto Serif SC", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1f4d3a 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #2a3d55 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+    header h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin: 0 0 8px;
+      letter-spacing: 0.04em;
+    }
+    header p { margin: 0 0 28px; color: var(--muted); max-width: 42rem; line-height: 1.6; }
+    label { display: block; margin: 14px 0 8px; color: var(--muted); font-size: 0.9rem; }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      color: var(--ink);
+      font: inherit;
+      resize: vertical;
+    }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #062116;
+    }
+    button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    button:disabled { opacity: 0.5; cursor: wait; }
+    .panel {
+      margin-top: 28px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(8px);
+    }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .metric { padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2); }
+    .metric .k { color: var(--muted); font-size: 0.8rem; }
+    .metric .v { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+    .issue {
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+    .issue:first-child { border-top: 0; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .LOW { background: #1f3d30; color: var(--accent); }
+    .MEDIUM { background: #3d3420; color: var(--warn); }
+    .HIGH, .CRITICAL { background: #3d2020; color: var(--danger); }
+    .mono { font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; color: var(--muted); }
+    .hidden { display: none; }
+    @media (max-width: 700px) { .metrics { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>保真判</h1>
+      <p>面向数据治理的语义保真度评估智能体。比较治理前后文本，定位不合理修改，并给出 PASS / REVIEW / REJECT 路由与可追溯证据。</p>
+    </header>
+
+    <label for="before">治理前文本</label>
+    <textarea id="before">项目于2025年6月11日完成验收，项目金额为1850万元。</textarea>
+
+    <label for="after">治理后文本</label>
+    <textarea id="after">项目于2025年完成验收，项目金额为1800万元。</textarea>
+
+    <div class="actions">
+      <button id="run">开始评估</button>
+      <button class="secondary" id="fillSafe" type="button">填入安全样例</button>
+    </div>
+
+    <div id="result" class="panel hidden">
+      <div class="metrics">
+        <div class="metric"><div class="k">总体评分</div><div class="v" id="score">-</div></div>
+        <div class="metric"><div class="k">风险等级</div><div class="v" id="risk">-</div></div>
+        <div class="metric"><div class="k">路由决策</div><div class="v" id="route">-</div></div>
+      </div>
+      <p id="summary" style="margin:16px 0 8px;line-height:1.6;color:var(--muted)"></p>
+      <p class="mono" id="ids"></p>
+      <h3 style="margin:20px 0 8px">风险列表</h3>
+      <div id="issues"></div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    $("fillSafe").onclick = () => {
+      $("before").value = "国家电网有限公司于今日发布通知。";
+      $("after").value = "国家电网于今日发布通知。";
+    };
+
+    $("run").onclick = async () => {
+      const btn = $("run");
+      btn.disabled = true;
+      btn.textContent = "评估中…";
+      try {
+        const create = await fetch("/api/v1/evaluations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            before_text: $("before").value,
+            after_text: $("after").value,
+            config_id: "default_v1"
+          })
+        });
+        if (!create.ok) throw new Error(await create.text());
+        const meta = await create.json();
+        const res = await fetch(`/api/v1/evaluations/${meta.task_id}/result`);
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        $("result").classList.remove("hidden");
+        $("score").textContent = data.overall_score.toFixed(1);
+        $("risk").textContent = data.risk_level;
+        $("route").textContent = data.route;
+        $("summary").textContent = data.summary;
+        $("ids").textContent = `task_id=${meta.task_id}  trace_id=${meta.trace_id}`;
+        $("issues").innerHTML = (data.issues || []).map(issue => `
+          <div class="issue">
+            <div><strong>${issue.change_type}</strong>
+              <span class="badge ${issue.risk_level}">${issue.risk_level}</span>
+              <span class="mono"> score=${issue.score} conf=${issue.confidence}</span>
+            </div>
+            <div style="margin-top:6px">${issue.reason}</div>
+            <div class="mono" style="margin-top:6px">${(issue.evidence || []).join(" · ")}</div>
+          </div>
+        `).join("") || "<p class='mono'>无问题</p>";
+      } catch (e) {
+        alert("评估失败: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "开始评估";
+      }
+    };
+  </script>
+</body>
+</html>

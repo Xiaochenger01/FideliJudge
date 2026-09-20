@@ -1,0 +1,15 @@
+routing:
+  auto_pass: 85
+  review: 60
+  critical_block: true
+  high_forces_review: true
+  low_confidence_forces_review: true
+  low_confidence_threshold: 0.55
+  # 真实 LLM 调用失败才考虑强制 REVIEW；无 key 的 mock 不得无差别转人工
+  fallback_forces_review: false
+
+risk_rank:
+  LOW: 1
+  MEDIUM: 2
+  HIGH: 3
+  CRITICAL: 4

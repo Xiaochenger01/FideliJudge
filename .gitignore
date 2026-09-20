@@ -1,0 +1,23 @@
+# FideliJudge local data / caches
+data/*
+!data/.gitkeep
+*.db
+.venv/
+.venv-linux/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+evaluation/reports/eval_*.json
+!evaluation/reports/ablation_*.json
+!evaluation/reports/human_agreement.json
+!evaluation/reports/latest.json
+!evaluation/reports/stability_latest.json
+experiments/*
+!experiments/.gitkeep
+.env
+*.pyc
+*.pptx
+.DS_Store
+Thumbs.db

@@ -1,0 +1,233 @@
+{
+  "timestamp": "2026-09-12T07:30:41.381943+00:00",
+  "annotator": "author_v1",
+  "n": 30,
+  "judge_provider": "mock",
+  "metrics_3class": {
+    "n": 30.0,
+    "accuracy": 0.7333,
+    "cohen_kappa": 0.5789,
+    "spearman": 0.7873,
+    "pearson": 0.8056
+  },
+  "metrics_binary_safe_unsafe": {
+    "n": 30.0,
+    "accuracy": 0.9,
+    "cohen_kappa": 0.7097,
+    "spearman": 0.7416,
+    "pearson": 0.7416
+  },
+  "details": [
+    {
+      "id": "case_001",
+      "human_route": "REVIEW",
+      "agent_route": "REJECT",
+      "agent_score": 53.6,
+      "match": false
+    },
+    {
+      "id": "case_002",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 62.0,
+      "match": true
+    },
+    {
+      "id": "case_003",
+      "human_route": "AUTO_PASS",
+      "agent_route": "AUTO_PASS",
+      "agent_score": 98.4,
+      "match": true
+    },
+    {
+      "id": "case_004",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 44.9,
+      "match": true
+    },
+    {
+      "id": "case_005",
+      "human_route": "AUTO_PASS",
+      "agent_route": "AUTO_PASS",
+      "agent_score": 99.8,
+      "match": true
+    },
+    {
+      "id": "case_006",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 62.0,
+      "match": true
+    },
+    {
+      "id": "case_007",
+      "human_route": "REVIEW",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": true
+    },
+    {
+      "id": "case_009",
+      "human_route": "AUTO_PASS",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": false
+    },
+    {
+      "id": "case_011",
+      "human_route": "REVIEW",
+      "agent_route": "REJECT",
+      "agent_score": 53.6,
+      "match": false
+    },
+    {
+      "id": "case_012",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 54.4,
+      "match": true
+    },
+    {
+      "id": "case_013",
+      "human_route": "AUTO_PASS",
+      "agent_route": "AUTO_PASS",
+      "agent_score": 98.4,
+      "match": true
+    },
+    {
+      "id": "case_014",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 44.9,
+      "match": true
+    },
+    {
+      "id": "case_015",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 62.0,
+      "match": true
+    },
+    {
+      "id": "case_016",
+      "human_route": "AUTO_PASS",
+      "agent_route": "AUTO_PASS",
+      "agent_score": 99.8,
+      "match": true
+    },
+    {
+      "id": "case_017",
+      "human_route": "REVIEW",
+      "agent_route": "REVIEW",
+      "agent_score": 78.4,
+      "match": true
+    },
+    {
+      "id": "case_018",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 57.0,
+      "match": true
+    },
+    {
+      "id": "case_019",
+      "human_route": "REJECT",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": false
+    },
+    {
+      "id": "case_020",
+      "human_route": "REVIEW",
+      "agent_route": "REJECT",
+      "agent_score": 62.0,
+      "match": false
+    },
+    {
+      "id": "case_021",
+      "human_route": "AUTO_PASS",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": false
+    },
+    {
+      "id": "case_022",
+      "human_route": "REVIEW",
+      "agent_route": "REVIEW",
+      "agent_score": 78.4,
+      "match": true
+    },
+    {
+      "id": "case_023",
+      "human_route": "REJECT",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": false
+    },
+    {
+      "id": "case_024",
+      "human_route": "REVIEW",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": true
+    },
+    {
+      "id": "case_026",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 62.0,
+      "match": true
+    },
+    {
+      "id": "case_027",
+      "human_route": "AUTO_PASS",
+      "agent_route": "REVIEW",
+      "agent_score": 84.4,
+      "match": false
+    },
+    {
+      "id": "case_028",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 53.6,
+      "match": true
+    },
+    {
+      "id": "case_030",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 44.9,
+      "match": true
+    },
+    {
+      "id": "case_033",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 44.9,
+      "match": true
+    },
+    {
+      "id": "case_034",
+      "human_route": "AUTO_PASS",
+      "agent_route": "AUTO_PASS",
+      "agent_score": 99.8,
+      "match": true
+    },
+    {
+      "id": "case_037",
+      "human_route": "REVIEW",
+      "agent_route": "REVIEW",
+      "agent_score": 78.4,
+      "match": true
+    },
+    {
+      "id": "case_039",
+      "human_route": "REJECT",
+      "agent_route": "REJECT",
+      "agent_score": 52.5,
+      "match": true
+    }
+  ],
+  "note": "三档路由 AUTO_PASS/REVIEW/REJECT；标注人为数据集作者。binary 将 REVIEW+REJECT 合并为 UNSAFE。"
+}
